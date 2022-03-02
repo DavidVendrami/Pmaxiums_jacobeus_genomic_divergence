@@ -30,7 +30,6 @@ HQ_mapped_reads[i]<-dim(data[data[,1]!=4 & data[,2]>=10,])[1]/dim(data)[1]
 out<-cbind(Sample,Tot_reads,Mapped_reads,HQ_mapped_reads)
 colnames(out)<-c("Sample","Tot_reads","Mapped_reads","HQ_mapped_reads")
 write.table(out,"Bam_stats.txt",quote=F,col.names=T,row.names=F,sep="\t")
-q()
-n
+
 
 
