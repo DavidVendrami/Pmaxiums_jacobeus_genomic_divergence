@@ -5,22 +5,22 @@ qsub -P fair_share -cwd -l idle=1 -e /prj/mar-in-gen/Pecten_M/scripts -o /prj/ma
 
 # 2. Now we can align the reads to the reference genome
 # First, index the reference
-bwa index GCF_902652985.1_xPecMax1.1_genomic.fna
+bwa index /prj/mar-in-gen/Pecten_M/New_Reference/Pecten_maximus.genomic.fa
 # Then align. We will have to use BWA aln/samse because the reads are really short. Pipe the output to samtools to convert to bam and sort.
 for i in /prj/mar-in-gen/Pecten_M/Clean/*.fq.gz
 do
 gzip -d $i
-/vol/biotools/bin/bwa aln -t 8 /prj/mar-in-gen/Pecten_M/Reference/GCF_902652985.1_xPecMax1.1_genomic.fna ${i%.gz} > ${i%.fq.gz}.sai
-/vol/biotools/bin/ bwa samse /prj/mar-in-gen/Pecten_M/Reference/GCF_902652985.1_xPecMax1.1_genomic.fna ${i%.fq.gz}.sai ${i%.gz} | \
+/vol/biotools/bin/bwa aln -t 8 /prj/mar-in-gen/Pecten_M/New_Reference/Pecten_maximus.genomic.fa ${i%.gz} > ${i%.fq.gz}.sai
+/vol/biotools/bin/ bwa samse /prj/mar-in-gen/Pecten_M/New_Reference/Pecten_maximus.genomic.fa ${i%.fq.gz}.sai ${i%.gz} | \
 /vol/biotools/bin/samtools view -b -h | /vol/biotools/bin/samtools sort -o ${i%.fq.gz}_sorted.bam
 gzip ${i%.gz}
 done
 # Run with:
-qsub -P fair_share -cwd -l idle=1 -e /prj/mar-in-gen/Pecten_M/scripts -o /prj/mar-in-gen/Pecten_M/scripts -pe multislot 8 -l vf=8G align_and_sort.sh
+qsub -P fair_share -cwd -l idle=1 -e /prj/mar-in-gen/Pecten_M/scripts -o /prj/mar-in-gen/Pecten_M/scripts -pe multislot 8 -l vf=8G Align_and_sort.sh
 
 
 # 3. Now we can use stacks ref_map.pl to call SNPs.
-/vol/animalbehaviour/davidlee/bin/bin/ref_map.pl --samples /prj/mar-in-gen/Pecten_M/Clean/ --popmap /prj/mar-in-gen/Pecten_M/Clean/popmap.txt -o ref_map_output -T 12
+/grp/animalbehaviour/davidlee/bin/bin/ref_map.pl --samples /prj/mar-in-gen/Pecten_M/Clean/ --popmap /prj/mar-in-gen/Pecten_M/Clean/popmap.txt -o ref_map_output -T 12
 
 qsub -P fair_share -cwd -l idle=1 -e /prj/mar-in-gen/Pecten_M/scripts -o /prj/mar-in-gen/Pecten_M/scripts -pe multislot 12 -l vf=8G Ref_map.sh
 
