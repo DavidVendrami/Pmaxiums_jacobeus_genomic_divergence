@@ -20,7 +20,7 @@ qsub -P fair_share -cwd -l idle=1 -e /prj/mar-in-gen/Pecten_M/scripts -o /prj/ma
 
 
 # 3. Now we can use stacks ref_map.pl to call SNPs.
-/grp/animalbehaviour/davidlee/bin/bin/ref_map.pl --samples /prj/mar-in-gen/Pecten_M/Clean/ --popmap /prj/mar-in-gen/Pecten_M/Clean/popmap.txt -o /prj/mar-in-gen/Pecten_M/Clean/ref_map_output -T 12
+/grp/animalbehaviour/davidlee/bin/bin/ref_map.pl --samples /prj/mar-in-gen/Pecten_M/Clean/ --popmap /prj/mar-in-gen/Pecten_M/Clean/popmap.txt -o /prj/mar-in-gen/Pecten_M/Clean/ref_map_output -T 12 -X "populations: --vcf"
 
 qsub -P fair_share -cwd -l idle=1 -e /prj/mar-in-gen/Pecten_M/scripts -o /prj/mar-in-gen/Pecten_M/scripts -pe multislot 12 -l vf=8G Ref_map.sh
 
