@@ -1,6 +1,6 @@
 # 71 Diagnostic loci
 
-data<-read.table("Final_All_MAF05.raw",h=T)
+data<-read.table("Pec_Biall_DP5_MissInd_MD80_NoRep_MAF05.raw",h=T)
 geno<-data[,-c(1:6)]
 genom<-geno[data$FID=="Pmax",]
 genoj<-geno[data$FID=="Pjac",]
@@ -20,7 +20,7 @@ indd<-which(ind==2)
 
 mne<-which(colnames(data)%in%names(indd))
 mne<-mne-6
-map<-read.table("Final_All_MAF05.map",h=F)
+map<-read.table("Pec_Biall_DP5_MissInd_MD80_NoRep_MAF05.map",h=F)
 Floc<-map[mne,]
 View(Floc)
 write.table(Floc,"Diagnostic_loci.txt",quote=F,col.names=F,row.names=F,sep="\t")
