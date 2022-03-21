@@ -26,7 +26,7 @@ qsub -P fair_share -cwd -l idle=1 -e /prj/mar-in-gen/Pecten_M/scripts -o /prj/ma
 
 # 4. Filtering
 vcftools --vcf populations.snps.vcf --min-alleles 2 --max-alleles 2 --remove-indels --minDP 5 --minGQ 5 --recode --out Pec_Biall_DP5
-# 323 x 1,051,046
+# 323 x 1,009,368
 
 # Let's output missingness per individual to see if we clearly have to remove someone.
 vcftools --vcf Pec_Biall_DP5.recode.vcf --missing-indv --out Pec_Biall_DP5_MissInd
