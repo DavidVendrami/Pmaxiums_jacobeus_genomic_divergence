@@ -2,8 +2,8 @@
 
 data<-read.table("Final_All_MAF05.raw",h=T)
 geno<-data[,-c(1:6)]
-genom<-geno[data$FID=="P_maximus",]
-genoj<-geno[data$FID=="P_jacobeus",]
+genom<-geno[data$FID=="Pmax",]
+genoj<-geno[data$FID=="Pjac",]
 lm<-apply(genom,2,function(x) dim(table(x)))
 lj<-apply(genoj,2,function(x) dim(table(x)))
 jna<-colnames(genoj[,which(lj==1)])
