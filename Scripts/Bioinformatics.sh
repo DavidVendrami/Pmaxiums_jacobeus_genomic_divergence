@@ -33,7 +33,7 @@ vcftools --vcf Pec_Biall_DP5.recode.vcf --missing-indv --out Pec_Biall_DP5_MissI
 
 # Let's remove the individuals with more than 800000 missing genotypes, see "Pec_miss_data_perInd.pdf"
 vcftools --vcf Pec_Biall_DP5.recode.vcf --remove Inds_to_remove.txt --recode --out Pec_Biall_DP5_GoodSam
-# 284 x 1,051,046
+# 284 x 1,009,368
 
 # Let's explor the effect of --max-missing
 vcftools --vcf Pec_Biall_DP5_GoodSam.recode.vcf --max-missing 0.9 --out Pec_Biall_DP5_MissInd_MD90 # 129,260
@@ -42,9 +42,9 @@ vcftools --vcf Pec_Biall_DP5_GoodSam.recode.vcf --max-missing 0.7 --out Pec_Bial
 
 # Let's try both 80 and 90
 vcftools --vcf Pec_Biall_DP5_GoodSam.recode.vcf --max-missing 0.8 --recode --out Pec_Biall_DP5_MissInd_MD80
-# 284 x 337,210
+# 284 x 321,973
 vcftools --vcf Pec_Biall_DP5_GoodSam.recode.vcf --max-missing 0.9 --recode --out Pec_Biall_DP5_MissInd_MD90
-# 284 x 129.260
+# 284 x 129,260
 
 # Too high cov 
 vcftools --vcf Pec_Biall_DP5_MissInd_MD80.recode.vcf --site-mean-depth --out Pec_Biall_DP5_MissInd_MD80_depth
