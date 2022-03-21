@@ -69,18 +69,3 @@ vcftools --vcf Pec_Biall_DP5_MissInd_MD80.recode.vcf --missing-indv --out Pec_Bi
 /vol/animalbehaviour/davidlee/bin/plink/plink --bfile Pec_Biall_DP5_MissInd_MD90_NoRep --aec --recodeA --out Pec_Biall_DP5_MissInd_MD90_NoRep
 ### 262 x (337,210 - MD80 | 129,260 - MD90)
 ### 262 = 27 Pj + 235 Pm
-
-
-
-
-# make ped/map, raw also after excluding BC pops (found P. jacobeus there?, PEB-PEB, RDB-CAM, TND-T, PLY-C) 
-# and artificail pops (MUL-A, BAN-R)
-/vol/animalbehaviour/davidlee/bin/plink/plink --bfile Pec_Biall_DP5_MissInd_MD80_NoRep --aec --remove Remove_BC_and_artificial.txt --make-bed --out Pec_Biall_DP5_MissInd_MD80_NoRep_NoBC
-/vol/animalbehaviour/davidlee/bin/plink/plink --bfile Pec_Biall_DP5_MissInd_MD90_NoRep --aec --remove Remove_BC_and_artificial.txt --make-bed --out Pec_Biall_DP5_MissInd_MD90_NoRep_NoBC
-/vol/animalbehaviour/davidlee/bin/plink/plink --bfile Pec_Biall_DP5_MissInd_MD80_NoRep_NoBC --aec --recode --out Pec_Biall_DP5_MissInd_MD80_NoRep_NoBC
-/vol/animalbehaviour/davidlee/bin/plink/plink --bfile Pec_Biall_DP5_MissInd_MD90_NoRep_NoBC --aec --recode --out Pec_Biall_DP5_MissInd_MD90_NoRep_NoBC
-/vol/animalbehaviour/davidlee/bin/plink/plink --bfile Pec_Biall_DP5_MissInd_MD80_NoRep_NoBC --aec --recodeA --out Pec_Biall_DP5_MissInd_MD80_NoRep_NoBC
-/vol/animalbehaviour/davidlee/bin/plink/plink --bfile Pec_Biall_DP5_MissInd_MD90_NoRep_NoBC --aec --recodeA --out Pec_Biall_DP5_MissInd_MD90_NoRep_NoBC
-### 150 x (337,210 - MD80 | 129,260 - MD90)
-### 150 = 27 Pj + 123 Pm
-
