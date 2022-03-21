@@ -18,7 +18,7 @@ n
 ### Fst
 ##### Need to filter for MAF
 vcftools ... --maf 0.05
-################## All_MD_80_MAF05: 262 x 47944
+################## All_MD_80_MAF05: 262 x 47,504
 vcftools --vcf Pec_Biall_DP5_MissInd_MD80_NoRep_MAF05.recode.vcf --weir-fst-pop P_jacobeus.txt --weir-fst-pop P_maximus.txt --out SNP_Fst_MAF05
 vcftools --vcf Pec_Biall_DP5_MissInd_MD80_NoRep_MAF05.recode.vcf --weir-fst-pop P_jacobeus.txt --weir-fst-pop P_maximus.txt --fst-window-size 100000 --out Window_Fst_MAF05
 vcftools --vcf Pec_Biall_DP5_MissInd_MD80_NoRep_MAF05.recode.vcf --weir-fst-pop P_jacobeus.txt --weir-fst-pop P_maximus.txt --fst-window-size 100000 --fst-window-step 10000 --out Window_Step_Fst_MAF05
