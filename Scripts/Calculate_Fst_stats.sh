@@ -18,7 +18,7 @@ n
 ### Fst
 ##### Need to filter for MAF
 vcftools ... --maf 0.05
-################## All_MD_80_MAF05: 262 x 47,504
+################## All_MD_80_MAF05: 262 x 45,704
 vcftools --vcf Pec_Biall_DP5_MissInd_MD80_NoRep_MAF05.recode.vcf --weir-fst-pop P_jacobeus.txt --weir-fst-pop P_maximus.txt --out SNP_Fst_MAF05
 vcftools --vcf Pec_Biall_DP5_MissInd_MD80_NoRep_MAF05.recode.vcf --weir-fst-pop P_jacobeus.txt --weir-fst-pop P_maximus.txt --fst-window-size 100000 --out Window_Fst_MAF05
 vcftools --vcf Pec_Biall_DP5_MissInd_MD80_NoRep_MAF05.recode.vcf --weir-fst-pop P_jacobeus.txt --weir-fst-pop P_maximus.txt --fst-window-size 100000 --fst-window-step 10000 --out Window_Step_Fst_MAF05
@@ -36,16 +36,16 @@ for (i in 2:length(data$CHROM)){
     col[i]<-cols[which(cols!=col[i-1])]
   }
 }
-col[47397:length(col)]<-"grey85" 
+col[45644:length(col)]<-"grey85" 
 data$col<-col
 
-labs<-table(data$CHROM)[1:19]
+labs<-table(factor(data$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
 bla<-c()
 bla[1]<-labs[1]/2
 for (i in 2:19){
 bla[i]<-sum(labs[1:i-1])+labs[i]/2
 }
-bla[20]<-47750
+bla[20]<-45604
 
 pdf("SingleSNP_Fst_MD80_MAF05.pdf",width=16,height=6)
 
@@ -69,16 +69,16 @@ for (i in 2:length(data$CHROM)){
     col[i]<-cols[which(cols!=col[i-1])]
   }
 }
-col[4737:length(col)]<-"grey85" 
+col[4458:length(col)]<-"grey85" 
 data$col<-col
 
-labs<-table(data$CHROM)[1:19]
+labs<-table(factor(data$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
 bla<-c()
 bla[1]<-labs[1]/2
 for (i in 2:19){
 bla[i]<-sum(labs[1:i-1])+labs[i]/2
 }
-bla[20]<-4750
+bla[20]<-4457
 
 pdf("Stepping_Windowed_SNP_Fst_MD80_MAF05.pdf",width=16,height=6)
 
@@ -102,11 +102,11 @@ for (i in 2:length(data$CHROM)){
     col[i]<-cols[which(cols!=col[i-1])]
   }
 }
-col[47240:length(col)]<-"grey85" 
+col[44601:length(col)]<-"grey85" 
 data$col<-col
 
 
-labs<-table(data$CHROM)[1:19]
+labs<-table(factor(data$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
 bla<-c()
 bla[1]<-labs[1]/2
 for (i in 2:19){
