@@ -67,5 +67,5 @@ vcftools --vcf Pec_Biall_DP5_MissInd_MD80.recode.vcf --missing-indv --out Pec_Bi
 /vol/animalbehaviour/davidlee/bin/plink/plink --bfile Pec_Biall_DP5_MissInd_MD90_NoRep --aec --recode --out Pec_Biall_DP5_MissInd_MD90_NoRep
 /vol/animalbehaviour/davidlee/bin/plink/plink --bfile Pec_Biall_DP5_MissInd_MD80_NoRep --aec --recodeA --out Pec_Biall_DP5_MissInd_MD80_NoRep
 /vol/animalbehaviour/davidlee/bin/plink/plink --bfile Pec_Biall_DP5_MissInd_MD90_NoRep --aec --recodeA --out Pec_Biall_DP5_MissInd_MD90_NoRep
-### 262 x (337,210 - MD80 | 129,260 - MD90)
+### 262 x (321,973 - MD80 | 129,260 - MD90)
 ### 262 = 27 Pj + 235 Pm
