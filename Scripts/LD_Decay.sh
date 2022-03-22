@@ -18,6 +18,6 @@ fpoints<-((10+new.rho*distance)/((2+new.rho*distance)*(11+new.rho*distance)))*(1
 ld.df<-data.frame(distance,fpoints)
 ld.df<-ld.df[order(ld.df$distance),]
 png("LD_Decay_MAF05_final.tiff",width=6, height=7, units= 'in', res=600)
-plot(distance,LD.data,pch=19,cex=0.9)
-lines(ld.df$distance,ld.df$fpoints,lty=3,lwd=2,col="blue")
+plot(distance,LD.data,pch=19,cex=0.9,xlim=c(0,4),ylim=c(0,0.5),col=transp("black",.2))
+lines(ld.df$distance,ld.df$fpoints,lwd=2,col="blue")
 dev.off()
