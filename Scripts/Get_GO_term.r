@@ -83,45 +83,110 @@ colnames(data)<-c("CHR","Start","Stop","Annotation")
 data[,1]<-as.character(data[,1])
 snps[,1]<-as.character(snps[,1])
 
-out<-data.frame(CHR=c(),Start=c(),Stop=c(),Annotation=c())
+out<-data.frame(CHR=c(),Start=c(),Stop=c(),Within_gene=c(),Annotation=c())
 
 for (i in 1:length(snps[,1])){
-
-dat<-data[data$CHR==snps[i,1],]
-ind<-which(dat$Start<=snps[i,2] & dat$Stop>=snps[i,2])
-
-if (length(ind)!=0){
-out<-rbind(out,dat[ind,])
-} else {
-a<-dat[dat$Start>snps[i,2],]
-b<-dat[dat$Start<=snps[i,2],]
-am<-min(a$Start)
-bm<-max(b$Stop)
-
-if(am<bm){
-ind<-which(dat$Start==am)
-out<-rbind(out,dat[ind,])
-} else {
-ind<-which(dat$Stop==bm)
-out<-rbind(out,dat[ind,])
-}
-}
+  
+  dat<-data[data$CHR==snps[i,1],]
+  ind<-which(dat$Start<=snps[i,2] & dat$Stop>=snps[i,2])
+  
+  if (length(ind)!=0){
+    if (length(ind)>1){
+      ind<-ind[1]}
+    bla<-dat[ind,]
+    bla$Within_gene<-"YES"
+    out<-rbind(out,bla)
+  } else {
+    a<-dat[dat$Start>snps[i,2],]
+    b<-dat[dat$Start<=snps[i,2],]
+    am<-min(a$Start)
+    bm<-max(b$Stop)
+    
+    if(am<bm){
+      ind<-which(dat$Start==am)
+      bla<-dat[ind,]
+      bla$Within_gene<-"NO"
+      out<-rbind(out,bla)
+    } else {
+      ind<-which(dat$Stop==bm)
+      bla<-dat[ind,]
+      bla$Within_gene<-"NO"
+      out<-rbind(out,bla)
+    }
+  }
 }
 
 rem<-which(duplicated(out$Annotation))
 out_r<-out[-rem,]
 
-write.table(out_r,"/prj/mar-in-gen/Pecten_M/Enrichment_new/Low_diff/SNP_Annotations.gff",quote=F,col.names=F,row.names=F,sep="\t")
+yes<-out[out$Within_gene=="YES",]
+rem_y<-which(duplicated(yes$Annotation))
+yes_r<-yes[-rem_y,]
+
+write.table(out_r,"SNP_all_rem.gff",quote=F,col.names=T,row.names=F,sep="\t") # only for GO without duplicates
+write.table(out,"SNP_all_Annotations.gff",quote=F,col.names=T,row.names=F,sep="\t") # to be fully annotated and for GO enrich.anal. to see if having multiple entries of the same GO term change things
+write.table(yes_r,"SNP_YES_rem.gff",quote=F,col.names=T,row.names=F,sep="\t") # only for GO without duplicates
+write.table(yes,"SNP_YES_Annotations.gff",quote=F,col.names=T,row.names=F,sep="\t") # only for GO with duplicates
 
 ### Switch to BASH and 
 # 1. extract gene names for GO enrichment analysis
-# 2. Extract gene sequences, in case you want to annotate them
+cut -d$'\t' -f4 SNP_all_rem.gff | cut -d ';' -f1 | sed 's/ID=//g' | sed '1d' > AllRem_Gene_IDs_for_GOenrich.txt
+cut -d$'\t' -f4 SNP_all_Annotations.gff | cut -d ';' -f1 | sed 's/ID=//g' | sed '1d' > All_Gene_IDs_for_GOenrich.txt
+cut -d$'\t' -f4 SNP_YES_rem.gff | cut -d ';' -f1 | sed 's/ID=//g' | sed '1d' > YesRem_Gene_IDs_for_GOenrich.txt
+cut -d$'\t' -f4 SNP_YES_Annotations.gff | cut -d ';' -f1 | sed 's/ID=//g' | sed '1d' > Yes_Gene_IDs_for_GOenrich.txt
 
-# 1.
-cut -d$'\t' -f4 SNP_Annotations.gff | cut -d ';' -f1 | sed 's/ID=//g' > Gene_IDs_for_GOenrich.txt
+# 2. Annotate genes with NR, KEGG, SWISSPROT and GO
+sed 's/$/\t/g' AllRem_Gene_IDs_for_GOenrich.txt > patterns.txt
+grep -f patterns.txt /prj/mar-in-gen/Pecten_M/Enrichment_new/Annotation_files/NR.result | cut -d $'\t' -f1,5,14 | tr ' ' '_' > DB.txt
+grep -f patterns.txt /prj/mar-in-gen/Pecten_M/Enrichment_new/Annotation_files/Swissprot.result | cut -d $'\t' -f1,5,16 | tr ' ' '_' > DB_swiss.txt
+grep -f patterns.txt /prj/mar-in-gen/Pecten_M/Enrichment_new/Annotation_files/KEGG.result | cut -d $'\t' -f1,5,16 | tr ' ' '_' > DB_kegg.txt
 
-# 2.
-cut -d$'\t' -f1,2,3 SNP_Annotations.gff > Genes.bed
+
+R
+data<-read.table("SNP_all_Annotations.gff",h=T)
+db<-read.table("DB.txt",h=F)
+dbs<-read.table("DB_swiss.txt",h=F)
+dbk<-read.table("DB_kegg.txt",h=F)
+newd<-read.table("All_Gene_IDs_for_GOenrich.txt",h=F)
+data$Annotation<-newd[,1]
+
+for (i in 1:length(data[,1])){
+ind<-which(as.character(db[,1])==as.character(data$Annotation[i]))
+if (length(ind)!=0){
+data$NR_ID[i]<-as.character(db[ind,2])
+data$NR_Description[i]<-as.character(db[ind,3])
+} else {
+data$NR_ID[i]<-NA
+data$NR_Description[i]<-NA
+}
+}
+
+for (i in 1:length(data[,1])){
+ind<-which(as.character(dbs[,1])==as.character(data$Annotation[i]))
+if (length(ind)!=0){
+data$SwissP_ID[i]<-as.character(dbs[ind,2])
+data$SwissP_Description[i]<-as.character(dbs[ind,3])
+} else {
+data$SwissP_ID[i]<-NA
+data$SwissP_Description[i]<-NA
+}
+}
+
+for (i in 1:length(data[,1])){
+ind<-which(as.character(dbk[,1])==as.character(data$Annotation[i]))
+if (length(ind)!=0){
+data$KEGG_ID[i]<-as.character(dbk[ind,2])
+data$KEGG_Description[i]<-as.character(dbk[ind,3])
+} else {
+data$KEGG_ID[i]<-NA
+data$KEGG_Description[i]<-NA
+}
+}
+
+write.table(data,"All_q99_SNPs_Annotations.txt",quote=F,col.names=T,row.names=F,sep="\t")
+
+# 3. Extract gene sequences, in case you want to annotate them
+cut -d$'\t' -f1,2,3 SNP_all_rem.gff > Genes.bed
 bedtools getfasta -fi /prj/mar-in-gen/Pecten_M/New_Reference/Pecten_maximus.genomic.fa -bed Genes.bed -fo ./Gene_seqs.fasta
 
 #################################################
