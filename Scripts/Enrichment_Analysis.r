@@ -1,7 +1,7 @@
 # Perform enrichment analysis on regions of interest
 
 library(topGO)
-library(qvalue)
+# library(qvalue)
 geneID2GO <- readMappings(file = choose.files()) #GO annotations of all genes
 geneUniverse <- names(geneID2GO)
 genesOfInterest <- read.table(choose.files(),header=FALSE) #Significant loci
@@ -22,10 +22,10 @@ allResMFe <- GenTable(myGOdataMF, classicFisher = resultFisherMFe, orderBy = "re
 allResBPw <- GenTable(myGOdataBP, classicFisher = resultFisherBPw, orderBy = "resultFisher", ranksOf = "classicFisher", topNodes = length(resultFisherBPw@score)) #N is the number of scored GO terms (you can see it when you type resultFisher)
 allResBPe <- GenTable(myGOdataBP, classicFisher = resultFisherBPe, orderBy = "resultFisher", ranksOf = "classicFisher", topNodes = length(resultFisherBPe@score)) #N is the number of scored GO terms (you can see it when you type resultFisher)
 
-write.table(allResMFw,"MF_q99_Weight.txt",quote=F,col.names=T,row.names=F,sep="\t")
-write.table(allResMFe,"MF_q99_Elim.txt",quote=F,col.names=T,row.names=F,sep="\t")
-write.table(allResBPw,"BP_q99_Weight.txt",quote=F,col.names=T,row.names=F,sep="\t")
-write.table(allResBPe,"BP_q99_Elim.txt",quote=F,col.names=T,row.names=F,sep="\t")
+write.table(allResMFw,"MF_Diag_Weight.txt",quote=F,col.names=T,row.names=F,sep="\t")
+write.table(allResMFe,"MF_Diag_Elim.txt",quote=F,col.names=T,row.names=F,sep="\t")
+write.table(allResBPw,"BP_Diag_Weight.txt",quote=F,col.names=T,row.names=F,sep="\t")
+write.table(allResBPe,"BP_Diag_Elim.txt",quote=F,col.names=T,row.names=F,sep="\t")
 
 
 

@@ -76,7 +76,8 @@ write.table(ld_out,"/prj/mar-in-gen/Pecten_M/Enrichment_new/Low_diff/ld_loc_rep.
 
 ###########################################
 
-### Extract genes (where SNPs are located in or the closest one)
+### Extract genes (where SNPs are located in or the closest one).
+### Do the following for all regions of interest (change input for 'snps' accordingly).
 snps<-read.table("/prj/mar-in-gen/Pecten_M/Enrichment_new/Diagnostic_loci/Diag_loc_rep.txt",h=T) # Read in file with SNP locations
 data<-read.table("/prj/mar-in-gen/Pecten_M/Enrichment_new/Annotation_files/Pecten_maximus_mRNA.gff",h=F) # Read in annotation file.
 colnames(data)<-c("CHR","Start","Stop","Annotation")
@@ -124,15 +125,15 @@ rem_y<-which(duplicated(yes$Annotation))
 yes_r<-yes[-rem_y,]
 
 write.table(out_r,"SNP_all_rem.gff",quote=F,col.names=T,row.names=F,sep="\t") # only for GO without duplicates
-write.table(out,"SNP_all_Annotations.gff",quote=F,col.names=T,row.names=F,sep="\t") # to be fully annotated and for GO enrich.anal. to see if having multiple entries of the same GO term change things
+#write.table(out,"SNP_all_Annotations.gff",quote=F,col.names=T,row.names=F,sep="\t") # to be fully annotated and for GO enrich.anal. to see if having multiple entries of the same GO term change things
 write.table(yes_r,"SNP_YES_rem.gff",quote=F,col.names=T,row.names=F,sep="\t") # only for GO without duplicates
-write.table(yes,"SNP_YES_Annotations.gff",quote=F,col.names=T,row.names=F,sep="\t") # only for GO with duplicates
+#write.table(yes,"SNP_YES_Annotations.gff",quote=F,col.names=T,row.names=F,sep="\t") # only for GO with duplicates
 
 ### Switch to BASH and 
 # 1. extract gene names for GO enrichment analysis
-cut -d$'\t' -f4 SNP_all_rem.gff | cut -d ';' -f1 | sed 's/ID=//g' | sed '1d' > AllRem_Gene_IDs_for_GOenrich.txt
+#cut -d$'\t' -f4 SNP_all_rem.gff | cut -d ';' -f1 | sed 's/ID=//g' | sed '1d' > AllRem_Gene_IDs_for_GOenrich.txt
 cut -d$'\t' -f4 SNP_all_Annotations.gff | cut -d ';' -f1 | sed 's/ID=//g' | sed '1d' > All_Gene_IDs_for_GOenrich.txt
-cut -d$'\t' -f4 SNP_YES_rem.gff | cut -d ';' -f1 | sed 's/ID=//g' | sed '1d' > YesRem_Gene_IDs_for_GOenrich.txt
+#cut -d$'\t' -f4 SNP_YES_rem.gff | cut -d ';' -f1 | sed 's/ID=//g' | sed '1d' > YesRem_Gene_IDs_for_GOenrich.txt
 cut -d$'\t' -f4 SNP_YES_Annotations.gff | cut -d ';' -f1 | sed 's/ID=//g' | sed '1d' > Yes_Gene_IDs_for_GOenrich.txt
 
 # 2. Annotate genes with NR, KEGG, SWISSPROT and GO
@@ -183,9 +184,10 @@ data$KEGG_Description[i]<-NA
 }
 }
 
-write.table(data,"All_q99_SNPs_Annotations.txt",quote=F,col.names=T,row.names=F,sep="\t")
+write.table(data,"All_Diag_SNPs_Annotations.txt",quote=F,col.names=T,row.names=F,sep="\t")
 
 # 3. Extract gene sequences, in case you want to annotate them
+# bash
 cut -d$'\t' -f1,2,3 SNP_all_rem.gff > Genes.bed
 bedtools getfasta -fi /prj/mar-in-gen/Pecten_M/New_Reference/Pecten_maximus.genomic.fa -bed Genes.bed -fo ./Gene_seqs.fasta
 
