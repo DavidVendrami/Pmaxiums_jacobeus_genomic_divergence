@@ -70,7 +70,7 @@ pij<-pi[indp,]
 ind<-which(dataj$col=="red")
 pij$col[ind]<-"red"
 
-# Plot
+# Plot pi while highlighting highly divergent windows
 pdf("Pi_fst_red.pdf",width=10,height=8)
 par(mfrow=c(2,1))
 par(xpd=T)
@@ -122,6 +122,7 @@ axis(2,at=c(0,0.00003,0.00006),labels=c("0","3e-05","6e-05"))
 text(-160,8e-5,substitute(paste('(b) ',italic('P. jacobeus'))),cex=1.4)
 dev.off()
 
+# Alternative way of visualizing relationship between Fst and pi
 pdf("Fst_pi_spec.pdf",width=8,height=6)
 datam$col[datam$col=="grey85"]<-"grey25"
 par(fig=c(0,0.5,0,0.8))
