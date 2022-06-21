@@ -26,14 +26,14 @@ qsub -P fair_share -cwd -l idle=1 -e /prj/mar-in-gen/Pecten_M/scripts -o /prj/ma
 
 # 4. Filtering
 vcftools --vcf populations.snps.vcf --min-alleles 2 --max-alleles 2 --remove-indels --minDP 5 --minGQ 5 --recode --out Pec_Biall_DP5
-# 323 x 1,009,368
+# 280 x 1,009,368
 
 # Let's output missingness per individual to see if we clearly have to remove someone.
 vcftools --vcf Pec_Biall_DP5.recode.vcf --missing-indv --out Pec_Biall_DP5_MissInd
 
 # Let's remove the individuals with more than 800000 missing genotypes, see "Pec_miss_data_perInd.pdf"
 vcftools --vcf Pec_Biall_DP5.recode.vcf --remove Inds_to_remove.txt --recode --out Pec_Biall_DP5_GoodSam
-# 284 x 1,009,368
+# 280 x 1,009,368
 
 # Let's explor the effect of --max-missing
 vcftools --vcf Pec_Biall_DP5_GoodSam.recode.vcf --max-missing 0.9 --out Pec_Biall_DP5_MissInd_MD90 # 129,260
@@ -42,9 +42,9 @@ vcftools --vcf Pec_Biall_DP5_GoodSam.recode.vcf --max-missing 0.7 --out Pec_Bial
 
 # Let's try both 80 and 90
 vcftools --vcf Pec_Biall_DP5_GoodSam.recode.vcf --max-missing 0.8 --recode --out Pec_Biall_DP5_MissInd_MD80
-# 284 x 321,973
+# 280 x 321,973
 vcftools --vcf Pec_Biall_DP5_GoodSam.recode.vcf --max-missing 0.9 --recode --out Pec_Biall_DP5_MissInd_MD90
-# 284 x 129,260
+# 280 x 129,260
 
 # Too high cov 
 vcftools --vcf Pec_Biall_DP5_MissInd_MD80.recode.vcf --site-mean-depth --out Pec_Biall_DP5_MissInd_MD80_depth
@@ -54,7 +54,7 @@ vcftools --vcf Pec_Biall_DP5_MissInd_MD80.recode.vcf --site-mean-depth --out Pec
 /vol/animalbehaviour/davidlee/bin/plink/plink --vcf Pec_Biall_DP5_MissInd_MD80.recode.vcf --out Pec_Biall_DP5_MissInd_MD80 --double-id --aec
 /vol/animalbehaviour/davidlee/bin/plink/plink --vcf Pec_Biall_DP5_MissInd_MD90.recode.vcf --out Pec_Biall_DP5_MissInd_MD90 --double-id --aec
 
-# Remove replicates,
+# Remove samples with too many missing genotypes.
 vcftools --vcf Pec_Biall_DP5_MissInd_MD80.recode.vcf --missing-indv --out Pec_Biall_DP5_MissInd_MD80_SNPs
 /vol/animalbehaviour/davidlee/bin/plink/plink --bfile Pec_Biall_DP5_MissInd_MD80 --aec --remove Remove_inds.txt --make-bed --out Pec_Biall_DP5_MissInd_MD80_NoRep
 /vol/animalbehaviour/davidlee/bin/plink/plink --bfile Pec_Biall_DP5_MissInd_MD90 --aec --remove Remove_inds.txt --make-bed --out Pec_Biall_DP5_MissInd_MD90_NoRep
