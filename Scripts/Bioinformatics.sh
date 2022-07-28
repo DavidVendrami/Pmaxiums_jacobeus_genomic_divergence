@@ -11,7 +11,7 @@ for i in /prj/mar-in-gen/Pecten_M/Clean/*.fq.gz
 do
 gzip -d $i
 /vol/biotools/bin/bwa aln -t 8 /prj/mar-in-gen/Pecten_M/New_Reference/Pecten_maximus.genomic.fa ${i%.gz} > ${i%.fq.gz}.sai
-/vol/biotools/bin/ bwa samse /prj/mar-in-gen/Pecten_M/New_Reference/Pecten_maximus.genomic.fa ${i%.fq.gz}.sai ${i%.gz} | \
+/vol/biotools/bin/bwa samse /prj/mar-in-gen/Pecten_M/New_Reference/Pecten_maximus.genomic.fa ${i%.fq.gz}.sai ${i%.gz} | \
 /vol/biotools/bin/samtools view -b -h | /vol/biotools/bin/samtools sort -o ${i%.fq.gz}_sorted.bam
 gzip ${i%.gz}
 done
