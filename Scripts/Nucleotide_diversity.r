@@ -126,7 +126,7 @@ dev.off()
 pdf("Fst_pi_spec.pdf",width=8,height=6)
 datam$col[datam$col=="grey85"]<-"grey25"
 par(fig=c(0,0.5,0,0.8))
-plot(pim$PI,datam$WEIGHTED_FST,xlab=expression(pi ~ (x ~ 10^-5)),ylab="Fst",col=transp(datam$col,.4),main="",xaxt='n')
+plot(pim$PI,datam$WEIGHTED_FST,xlab=expression(italic(pi) ~ (x ~ 10^-5)),ylab=expression(italic(F)[ST]),col=transp(datam$col,.2),main="",xaxt='n',pch=16)
 axis(1,at=c(0,0.00001,0.00002,0.00003,0.00004,0.00005),labels=c("0","1","2","3","4","5"))
 
 par(fig=c(0,0.5,0.5,1), new=TRUE)
@@ -137,7 +137,7 @@ text(0,200,substitute(paste('(a) ',italic('P. maximus'))),cex=1.2)
 par(new=T)
 dataj$col[dataj$col=="grey85"]<-"grey25"
 par(fig=c(0.5,1,0,0.8),new=T)
-plot(pij$PI,dataj$WEIGHTED_FST,xlab=expression(pi ~ (x ~ 10^-5)),ylab="Fst",col=transp(dataj$col,.4),main="",xaxt='n')
+plot(pij$PI,dataj$WEIGHTED_FST,xlab=expression(italic(pi) ~ (x ~ 10^-5)),ylab=expression(italic(F)[ST]),col=transp(dataj$col,.2),main="",xaxt='n',pch=16)
 axis(1,at=c(0,0.00001,0.00002,0.00003,0.00004,0.00005),labels=c("0","1","2","3","4","5"))
 
 par(fig=c(0.5,1,0.5,1), new=TRUE)
