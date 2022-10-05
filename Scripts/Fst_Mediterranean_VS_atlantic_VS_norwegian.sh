@@ -28,6 +28,7 @@ par(mfrow=c(2,1))
 # MaxJac
 data<-read.table("../Window_Fst_MAF05.windowed.weir.fst",h=T) # Read in stepping window fst file
 data<-data[data$N_VARIANTS>=5,] # Retain only windows with at least 10 SNPs inside
+data<-data[-c(4458:length(data$CHROM)),] # Remove unplaced scaffolds (only for the figure!)
 
 col<-c()
 cols<-c("grey25","grey85")
@@ -39,7 +40,7 @@ for (i in 2:length(data$CHROM)){
     col[i]<-cols[which(cols!=col[i-1])]
   }
 }
-col[4458:length(col)]<-"grey85" 
+#col[4458:length(col)]<-"grey85" 
 data$col<-col
 
 labs<-table(factor(data$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
@@ -48,7 +49,7 @@ bla[1]<-labs[1]/2
 for (i in 2:19){
 bla[i]<-sum(labs[1:i-1])+labs[i]/2
 }
-bla[20]<-4457
+#bla[20]<-4457
 
 plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',col=transp(data$col,.6),main="",ylim=c(0,1),pch=16,xlab="Chromosomes",ylab="Fst",cex.lab=1.25, cex.axis=1.25)
 axis(1,at=bla,labels=c(seq(1,19,by=1),"U"),cex.lab=0.4, cex.axis=1.25)
@@ -131,6 +132,7 @@ abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
 # Plot NorMax
 data<-read.table("Window_Fst_MaxNor.windowed.weir.fst",h=T) # Read in stepping window fst file
 data<-data[data$N_VARIANTS>=5,] # Retain only windows with at least 10 SNPs inside
+data<-data[-c(4446:length(data$CHROM)),] # Remove unplaced scaffolds (only for the figure!)
 
 col<-c()
 cols<-c("grey25","grey85")
@@ -142,7 +144,7 @@ for (i in 2:length(data$CHROM)){
     col[i]<-cols[which(cols!=col[i-1])]
   }
 }
-col[4446:length(col)]<-"grey85" 
+#col[4446:length(col)]<-"grey85" 
 data$col<-col
 
 labs<-table(factor(data$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
@@ -151,7 +153,7 @@ bla[1]<-labs[1]/2
 for (i in 2:19){
 bla[i]<-sum(labs[1:i-1])+labs[i]/2
 }
-bla[20]<-bla[19]+labs[19]/2+17
+#bla[20]<-bla[19]+labs[19]/2+17
 
 
 # layout(matrix(c(1,1,1,2), 1, 4, byrow = TRUE))
