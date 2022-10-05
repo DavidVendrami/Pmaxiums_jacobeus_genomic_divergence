@@ -123,7 +123,7 @@ text(-160,8e-5,substitute(paste('(b) ',italic('P. jacobeus'))),cex=1.4)
 dev.off()
 
 # Alternative way of visualizing relationship between Fst and pi
-pdf("Fst_pi_spec.pdf",width=8,height=6)
+pdf("/homes/davidlee/Desktop/Fst_pi_spec.pdf",width=8,height=6)
 datam$col[datam$col=="grey85"]<-"grey25"
 par(fig=c(0,0.5,0,0.8))
 plot(pim$PI,datam$WEIGHTED_FST,xlab=expression(italic(pi) ~ (x ~ 10^-5)),ylab=expression(italic(F)[ST]),col=transp(datam$col,.2),main="",xaxt='n',pch=16)
