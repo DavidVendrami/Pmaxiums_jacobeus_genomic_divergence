@@ -24,6 +24,7 @@ vcftools --vcf ../Pec_Biall_DP5_MissInd_MD80_NoRep_MAF05.recode.vcf --weir-fst-p
 pdf("/homes/davidlee/Desktop/WinFst_NorMax_2.pdf",width=15,height=10)
 #layout(matrix(c(1,1,1,2,3,3,3,4,5,5,5,6,7,7,7,8), 4, 4, byrow = TRUE))
 par(mfrow=c(2,1))
+par(xpd=F)
 
 # MaxJac
 data<-read.table("../Window_Fst_MAF05.windowed.weir.fst",h=T) # Read in stepping window fst file
@@ -55,6 +56,9 @@ plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',yaxt='n',col=transp(data$col,
 axis(1,at=bla,labels=c(seq(1,19,by=1)),cex.lab=0.4, cex.axis=1.25)
 axis(2,at=c(0,0.5,1),cex.lab=0.4, cex.axis=1.25,las=2)
 abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
+par(xpd=T)
+text(-580,1.2,"(a)",cex=1.6)
+par(xpd=F)
 
 #d <- density(data$WEIGHTED_FST)
 #plot(d,main="",xlab="Fst",xlim=c(-0.1,1),yaxt='n',ylab="")
@@ -163,6 +167,8 @@ plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',yaxt='n',col=transp(data$col,
 axis(1,at=bla,labels=c(seq(1,19,by=1)),cex.lab=0.4, cex.axis=1.25)
 axis(2,at=c(0,0.5,1),cex.lab=0.4, cex.axis=1.25,las=2)
 abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
+par(xpd=T)
+text(0,1.2,"(b)",cex=1.6)
 
 #d <- density(data$WEIGHTED_FST)
 #plot(d,main="",xlab="Fst",xlim=c(-0.1,1),yaxt='n',ylab="")
