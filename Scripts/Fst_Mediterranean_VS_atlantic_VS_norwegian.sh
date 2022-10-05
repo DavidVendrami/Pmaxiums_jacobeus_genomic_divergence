@@ -21,7 +21,9 @@ vcftools --vcf ../Pec_Biall_DP5_MissInd_MD80_NoRep_MAF05.recode.vcf --weir-fst-p
 # Weir and Cockerham mean Fst estimate: 0.10728
 # Weir and Cockerham weighted Fst estimate: 0.20085
 
-pdf("/homes/davidlee/Desktop/WinFst_NorMax_Fin.pdf",width=15,height=10)
+
+
+pdf("/homes/davidlee/Desktop/WinFst_NorMax_Fin.pdf",width=15,height=9)
 #layout(matrix(c(1,1,1,2,3,3,3,4,5,5,5,6,7,7,7,8), 4, 4, byrow = TRUE))
 par(mfrow=c(2,1))
 par(xpd=F)
@@ -48,16 +50,16 @@ labs<-table(factor(data$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_sc
 bla<-c()
 bla[1]<-labs[1]/2
 for (i in 2:19){
-bla[i]<-sum(labs[1:i-1])+labs[i]/2
+  bla[i]<-sum(labs[1:i-1])+labs[i]/2
 }
 #bla[20]<-4457
-
-plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',yaxt='n',col=transp(data$col,.6),main="",ylim=c(0,1),pch=16,xlab="Chromosomes",ylab="Fst",cex.lab=1.25, cex.axis=1.25)
+par(mar=c(5,5,4,2))
+plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',yaxt='n',col=transp(data$col,.6),main="",ylim=c(0,1),pch=16,xlab="Chromosomes",ylab=expression(italic(F)[ST]),cex.lab=1.25, cex.axis=1.25)
 axis(1,at=bla,labels=c(seq(1,19,by=1)),cex.lab=0.4, cex.axis=1.25)
 axis(2,at=c(0,0.5,1),cex.lab=0.4, cex.axis=1.25,las=2)
 abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
 par(xpd=T)
-text(-560,1.2,"(a)",cex=1.6)
+text(-450,1.2,"(a)",cex=1.8)
 par(xpd=F)
 
 #d <- density(data$WEIGHTED_FST)
@@ -156,26 +158,23 @@ labs<-table(factor(data$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_sc
 bla<-c()
 bla[1]<-labs[1]/2
 for (i in 2:19){
-bla[i]<-sum(labs[1:i-1])+labs[i]/2
+  bla[i]<-sum(labs[1:i-1])+labs[i]/2
 }
 #bla[20]<-bla[19]+labs[19]/2+17
 
 
 # layout(matrix(c(1,1,1,2), 1, 4, byrow = TRUE))
 
-plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',yaxt='n',col=transp(data$col,.6),main="",ylim=c(0,1),pch=16,xlab="Chromosomes",ylab="Fst",cex.lab=1.25, cex.axis=1.25)
+par(mar=c(5,5,4,2))
+plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',yaxt='n',col=transp(data$col,.6),main="",ylim=c(0,1),pch=16,xlab="Chromosomes",ylab=expression(italic(F)[ST]),cex.lab=1.25, cex.axis=1.25)
 axis(1,at=bla,labels=c(seq(1,19,by=1)),cex.lab=0.4, cex.axis=1.25)
 axis(2,at=c(0,0.5,1),cex.lab=0.4, cex.axis=1.25,las=2)
 abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
 par(xpd=T)
-text(-560,1.2,"(b)",cex=1.6)
+text(-450,1.2,"(b)",cex=1.8)
 
 #d <- density(data$WEIGHTED_FST)
 #plot(d,main="",xlab="Fst",xlim=c(-0.1,1),yaxt='n',ylab="")
 #polygon(d, col=transp("#7570b3",.6), border="#7570b3")
 
 dev.off()
-
-
-
-
