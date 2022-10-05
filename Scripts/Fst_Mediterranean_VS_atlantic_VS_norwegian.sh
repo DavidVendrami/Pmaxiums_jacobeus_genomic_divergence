@@ -51,8 +51,9 @@ bla[i]<-sum(labs[1:i-1])+labs[i]/2
 }
 #bla[20]<-4457
 
-plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',col=transp(data$col,.6),main="",ylim=c(0,1),pch=16,xlab="Chromosomes",ylab="Fst",cex.lab=1.25, cex.axis=1.25)
+plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',yaxt='n',col=transp(data$col,.6),main="",ylim=c(0,1),pch=16,xlab="Chromosomes",ylab="Fst",cex.lab=1.25, cex.axis=1.25)
 axis(1,at=bla,labels=c(seq(1,19,by=1)),cex.lab=0.4, cex.axis=1.25)
+axis(2,at=c(0,0.5,1),cex.lab=0.4, cex.axis=1.25,las=2)
 abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
 
 #d <- density(data$WEIGHTED_FST)
@@ -158,8 +159,9 @@ bla[i]<-sum(labs[1:i-1])+labs[i]/2
 
 # layout(matrix(c(1,1,1,2), 1, 4, byrow = TRUE))
 
-plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',col=transp(data$col,.6),main="",ylim=c(0,1),pch=16,xlab="Chromosomes",ylab="Fst",cex.lab=1.25, cex.axis=1.25)
+plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',yaxt='n',col=transp(data$col,.6),main="",ylim=c(0,1),pch=16,xlab="Chromosomes",ylab="Fst",cex.lab=1.25, cex.axis=1.25)
 axis(1,at=bla,labels=c(seq(1,19,by=1)),cex.lab=0.4, cex.axis=1.25)
+axis(2,at=c(0,0.5,1),cex.lab=0.4, cex.axis=1.25,las=2)
 abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
 
 #d <- density(data$WEIGHTED_FST)
