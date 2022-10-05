@@ -21,7 +21,7 @@ vcftools --vcf ../Pec_Biall_DP5_MissInd_MD80_NoRep_MAF05.recode.vcf --weir-fst-p
 # Weir and Cockerham mean Fst estimate: 0.10728
 # Weir and Cockerham weighted Fst estimate: 0.20085
 
-pdf("/homes/davidlee/Desktop/WinFst_NorMax_2.pdf",width=15,height=10)
+pdf("/homes/davidlee/Desktop/WinFst_NorMax_Fin.pdf",width=15,height=10)
 #layout(matrix(c(1,1,1,2,3,3,3,4,5,5,5,6,7,7,7,8), 4, 4, byrow = TRUE))
 par(mfrow=c(2,1))
 par(xpd=F)
@@ -57,7 +57,7 @@ axis(1,at=bla,labels=c(seq(1,19,by=1)),cex.lab=0.4, cex.axis=1.25)
 axis(2,at=c(0,0.5,1),cex.lab=0.4, cex.axis=1.25,las=2)
 abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
 par(xpd=T)
-text(-580,1.2,"(a)",cex=1.6)
+text(-560,1.2,"(a)",cex=1.6)
 par(xpd=F)
 
 #d <- density(data$WEIGHTED_FST)
@@ -168,7 +168,7 @@ axis(1,at=bla,labels=c(seq(1,19,by=1)),cex.lab=0.4, cex.axis=1.25)
 axis(2,at=c(0,0.5,1),cex.lab=0.4, cex.axis=1.25,las=2)
 abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
 par(xpd=T)
-text(0,1.2,"(b)",cex=1.6)
+text(-560,1.2,"(b)",cex=1.6)
 
 #d <- density(data$WEIGHTED_FST)
 #plot(d,main="",xlab="Fst",xlim=c(-0.1,1),yaxt='n',ylab="")
