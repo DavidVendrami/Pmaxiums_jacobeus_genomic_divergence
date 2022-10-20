@@ -11,7 +11,7 @@ vcftools --vcf Final_Pjca.recode.vcf --window-pi 100000 --out Pi_Pjac
 ### All
 # Repeat for p. maximus and p. jacobeus
 pi<-read.table("Pi_Pjac.windowed.pi",h=T)
-pi<-pi[pi$N_VARIANTS>=5,]
+#pi<-pi[pi$N_VARIANTS>=5,]
 labs<-table(factor(pi$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
 bla<-c()
 bla[1]<-labs[1]/2
@@ -70,47 +70,85 @@ pij<-pi[indp,]
 ind<-which(dataj$col=="red")
 pij$col[ind]<-"red"
 
+pij$win<-paste(pij$CHROM,pij$BIN_START,pij$BIN_END,sep="_")
+pim$win<-paste(pim$CHROM,pim$BIN_START,pim$BIN_END,sep="_")
+data$win<-paste(data$CHROM,data$BIN_START,data$BIN_END,sep="_")
+
+bla<-data.frame(win=data$win,FST=data$WEIGHTED_FST)
+mne<-left_join(bla,pim)
+bla<-mne[,-c(3,4,5,8)]
+colnames(bla)[3:4]<-c("N_VAR_max","PI_max")
+mne<-left_join(bla,pij,by="win")
+out<-mne[,-c(5,6,7,10)]
+colnames(out)[5:6]<-c("N_VAR_jac","PI_jac")
+
+cor.test(out$PI_max,out$FST,method="spearman")
+cor.test(out$PI_jac,out$FST,method="spearman")
+
+pdf("/homes/davidlee/Desktop/Fst_pi_spec_All.pdf",width=8,height=6)
+out$col[1:length(out$FST)]<-"black"
+out$col[out$FST>=quantile(out$FST,prob=0.95)]<-"red"
+par(fig=c(0,0.5,0,0.8))
+plot(out$PI_max,out$FST,xlab=expression(pi ~ (x ~ 10^-5)),ylab=expression(italic(F)[ST]),col=transp(out$col,.2),main="",xaxt='n',pch=16)
+axis(1,at=c(0,0.00001,0.00002,0.00003,0.00004,0.00005),labels=c("0","1","2","3","4","5"))
+
+par(fig=c(0,0.5,0.5,1), new=TRUE)
+hist(out$PI_max,breaks=100,border=NA,col="grey85",xaxt='n',yaxt='n',xlab="",ylab="",main="")
+par(xpd = TRUE)
+text(-0.000004,190,substitute(paste('(a) ',italic('P. maximus'))),cex=1.2)
+
+par(new=T)
+par(fig=c(0.5,1,0,0.8),new=T)
+plot(out$PI_jac,out$FST,xlab=expression(pi ~ (x ~ 10^-5)),ylab=expression(italic(F)[ST]),col=transp(out$col,.2),main="",xaxt='n',pch=16)
+axis(1,at=c(0,0.00001,0.00002,0.00003,0.00004,0.00005),labels=c("0","1","2","3","4","5"))
+
+par(fig=c(0.5,1,0.5,1), new=TRUE)
+hist(out$PI_jac,breaks=100,border=NA,col="grey85",xaxt='n',yaxt='n',xlab="",ylab="",main="")
+par(xpd = TRUE)
+text(-0.0000044,150,substitute(paste('(b) ',italic('P. jacobeus'))),cex=1.2)
+dev.off()
+
+col_2<-c()
+cols<-c("grey25","grey85")
+col_2[1]<-"grey25"
+for (i in 2:length(out$CHROM)){
+    if(out$CHROM[i]==out$CHROM[i-1]){
+        col_2[i]<-col_2[i-1]
+    } else {
+        col_2[i]<-cols[which(cols!=col_2[i-1])]
+    }
+}
+col_2[4458:length(col_2)]<-"grey85" #Pjac
+out$col_2<-col_2
+out$col_2[out$col=="red"]<-"red"
+
 # Plot pi while highlighting highly divergent windows
-pdf("Pi_fst_red.pdf",width=10,height=8)
+pdf("/homes/davidlee/Desktop/Pi_fst_red_All.pdf",width=10,height=8)
 par(mfrow=c(2,1))
 par(xpd=T)
-#plot(1:length(pia[,1]),pia$PI,xlim=c(0,length(pia[,1])),xaxt='n',col=transp(pia$col,.6),ylim=c(0,6e-05),pch=16,xlab="Chromosomes",ylab=expression(pi),cex.lab=1.25, cex.axis=1.25)
-#pia$x<-1:length(pia[,1])
-#par(new=T)
-#piar<-pia[pia$col=="red",]
-#plot(piar$x,piar$PI,xlim=c(0,length(pia[,1])),xaxt='n',col=transp(piar$col,.6),ylim=c(0,6e-05),pch=16,xlab="Chromosomes",ylab=expression(pi),cex.lab=1.25, cex.axis=1.25)
-#labs<-table(factor(pia$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
-#bla<-c()
-#bla[1]<-labs[1]/2
-#for (i in 2:19){
-#bla[i]<-sum(labs[1:i-1])+labs[i]/2
-#}
-#bla[20]<-bla[19]+labs[19]/2+17
-#axis(1,at=bla,labels=c(seq(1,19,by=1),"U"),cex.lab=0.4, cex.axis=1.25)
-#text(-160,8e-5,"(a) Both species",cex=1.4)
 
-plot(1:length(pim[,1]),pim$PI,xlim=c(0,length(pim[,1])),xaxt='n',yaxt='n',col=transp(pim$col,.6),ylim=c(0,6e-05),pch=16,xlab="Chromosomes",ylab=expression(pi),cex.lab=1.25, cex.axis=1.25)
-pim$x<-1:length(pim[,1])
+plot(1:length(out[,1]),out$PI_max,xlim=c(0,length(out[,1])),xaxt='n',yaxt='n',col=transp(out$col_2,.6),ylim=c(0,6e-05),pch=16,xlab="Chromosomes",ylab=expression(pi),cex.lab=1.25, cex.axis=1.25)
+out$x<-1:length(out[,1])
 par(new=T)
-pimr<-pim[pim$col=="red",]
-plot(pimr$x,pimr$PI,xlim=c(0,length(pim[,1])),xaxt='n',yaxt='n',col=transp(pimr$col,.6),ylim=c(0,6e-05),pch=16,xlab="",ylab="",cex.lab=1.25, cex.axis=1.25)
-labs<-table(factor(pim$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
+pimr<-out[out$col=="red",]
+plot(pimr$x,pimr$PI_max,xlim=c(0,length(out[,1])),xaxt='n',yaxt='n',col=transp(pimr$col_2,.6),ylim=c(0,6e-05),pch=16,xlab="",ylab="",cex.lab=1.25, cex.axis=1.25)
+labs<-table(factor(out$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
 bla<-c()
 bla[1]<-labs[1]/2
 for (i in 2:19){
 bla[i]<-sum(labs[1:i-1])+labs[i]/2
 }
 bla[20]<-bla[19]+labs[19]/2+17
-axis(1,at=bla,labels=c(seq(1,19,by=1),"U"),cex.lab=0.4, cex.axis=1.25)
+axis(1,at=bla,labels=c(seq(1,19,by=1),"U"),cex.lab=0.1, cex.axis=1.25)
 axis(2,at=c(0,0.00003,0.00006),labels=c("0","3e-05","6e-05"))
 text(-170,8e-5,substitute(paste('(a) ',italic('P. maximus'))),cex=1.4)
 
-plot(1:length(pij[,1]),pij$PI,xlim=c(0,length(pij[,1])),xaxt='n',yaxt='n',col=transp(pij$col,.6),ylim=c(0,6e-05),pch=16,xlab="Chromosomes",ylab=expression(pi),cex.lab=1.25, cex.axis=1.25)
-pij$x<-1:length(pij[,1])
+plot(1:length(out[,1]),out$PI_jac,xlim=c(0,length(out[,1])),xaxt='n',yaxt='n',col=transp(out$col_2,.6),ylim=c(0,6e-05),pch=16,xlab="Chromosomes",ylab=expression(pi),cex.lab=1.25, cex.axis=1.25)
+out$x<-1:length(out[,1])
 par(new=T)
-pijr<-pij[pij$col=="red",]
-plot(pijr$x,pijr$PI,xlim=c(0,length(pij[,1])),xaxt='n',yaxt='n',col=transp(pijr$col,.6),ylim=c(0,6e-05),pch=16,xlab="",ylab="",cex.lab=1.25, cex.axis=1.25)
-labs<-table(factor(pij$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
+pijr<-out[out$col=="red",]
+plot(pijr$x,pijr$PI_jac,xlim=c(0,length(out[,1])),xaxt='n',yaxt='n',col=transp(pijr$col_2,.6),ylim=c(0,6e-05),pch=16,xlab="",ylab="",cex.lab=1.25, cex.axis=1.25)
+labs<-table(factor(out$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
 bla<-c()
 bla[1]<-labs[1]/2
 for (i in 2:19){
@@ -122,27 +160,82 @@ axis(2,at=c(0,0.00003,0.00006),labels=c("0","3e-05","6e-05"))
 text(-160,8e-5,substitute(paste('(b) ',italic('P. jacobeus'))),cex=1.4)
 dev.off()
 
-# Alternative way of visualizing relationship between Fst and pi
-pdf("/homes/davidlee/Desktop/Fst_pi_spec.pdf",width=8,height=6)
-datam$col[datam$col=="grey85"]<-"grey25"
-par(fig=c(0,0.5,0,0.8))
-plot(pim$PI,datam$WEIGHTED_FST,xlab=expression(pi ~ (x ~ 10^-5)),ylab=expression(italic(F)[ST]),col=transp(datam$col,.2),main="",xaxt='n',pch=16)
-axis(1,at=c(0,0.00001,0.00002,0.00003,0.00004,0.00005),labels=c("0","1","2","3","4","5"))
 
-par(fig=c(0,0.5,0.5,1), new=TRUE)
-hist(pim$PI,breaks=100,border=NA,col="grey85",xaxt='n',yaxt='n',xlab="",ylab="",main="")
-par(xpd = TRUE)
-text(-0.000004,200,substitute(paste('(a) ',italic('P. maximus'))),cex=1.2)
 
-par(new=T)
-dataj$col[dataj$col=="grey85"]<-"grey25"
-par(fig=c(0.5,1,0,0.8),new=T)
-plot(pij$PI,dataj$WEIGHTED_FST,xlab=expression(pi ~ (x ~ 10^-5)),ylab=expression(italic(F)[ST]),col=transp(dataj$col,.2),main="",xaxt='n',pch=16)
-axis(1,at=c(0,0.00001,0.00002,0.00003,0.00004,0.00005),labels=c("0","1","2","3","4","5"))
-
-par(fig=c(0.5,1,0.5,1), new=TRUE)
-hist(pij$PI,breaks=100,border=NA,col="grey85",xaxt='n',yaxt='n',xlab="",ylab="",main="")
-par(xpd = TRUE)
-text(-0.0000044,150,substitute(paste('(b) ',italic('P. jacobeus'))),cex=1.2)
-dev.off()
+### Older stuff: not used for publication
+## Plot pi while highlighting highly divergent windows
+#pdf("Pi_fst_red.pdf",width=10,height=8)
+#par(mfrow=c(2,1))
+#par(xpd=T)
+##plot(1:length(pia[,1]),pia$PI,xlim=c(0,length(pia[,1])),xaxt='n',col=transp(pia$col,.6),ylim=c(0,6e-05),pch=16,xlab="Chromosomes",ylab=expression(pi),cex.lab=1.25, cex.axis=1.25)
+##pia$x<-1:length(pia[,1])
+##par(new=T)
+##piar<-pia[pia$col=="red",]
+##plot(piar$x,piar$PI,xlim=c(0,length(pia[,1])),xaxt='n',col=transp(piar$col,.6),ylim=c(0,6e-05),pch=16,xlab="Chromosomes",ylab=expression(pi),cex.lab=1.25, cex.axis=1.25)
+##labs<-table(factor(pia$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
+##bla<-c()
+##bla[1]<-labs[1]/2
+##for (i in 2:19){
+##bla[i]<-sum(labs[1:i-1])+labs[i]/2
+##}
+##bla[20]<-bla[19]+labs[19]/2+17
+##axis(1,at=bla,labels=c(seq(1,19,by=1),"U"),cex.lab=0.4, cex.axis=1.25)
+##text(-160,8e-5,"(a) Both species",cex=1.4)
+#
+#plot(1:length(pim[,1]),pim$PI,xlim=c(0,length(pim[,1])),xaxt='n',yaxt='n',col=transp(pim$col,.6),ylim=c(0,6e-05),pch=16,xlab="Chromosomes",ylab=expression(pi),cex.lab=1.25, cex.axis=1.25)
+#pim$x<-1:length(pim[,1])
+#par(new=T)
+#pimr<-pim[pim$col=="red",]
+#plot(pimr$x,pimr$PI,xlim=c(0,length(pim[,1])),xaxt='n',yaxt='n',col=transp(pimr$col,.6),ylim=c(0,6e-05),pch=16,xlab="",ylab="",cex.lab=1.25, cex.axis=1.25)
+#labs<-table(factor(pim$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
+#bla<-c()
+#bla[1]<-labs[1]/2
+#for (i in 2:19){
+#bla[i]<-sum(labs[1:i-1])+labs[i]/2
+#}
+#bla[20]<-bla[19]+labs[19]/2+17
+#axis(1,at=bla,labels=c(seq(1,19,by=1),"U"),cex.lab=0.4, cex.axis=1.25)
+#axis(2,at=c(0,0.00003,0.00006),labels=c("0","3e-05","6e-05"))
+#text(-170,8e-5,substitute(paste('(a) ',italic('P. maximus'))),cex=1.4)
+#
+#plot(1:length(pij[,1]),pij$PI,xlim=c(0,length(pij[,1])),xaxt='n',yaxt='n',col=transp(pij$col,.6),ylim=c(0,6e-05),pch=16,xlab="Chromosomes",ylab=expression(pi),cex.lab=1.25, cex.axis=1.25)
+#pij$x<-1:length(pij[,1])
+#par(new=T)
+#pijr<-pij[pij$col=="red",]
+#plot(pijr$x,pijr$PI,xlim=c(0,length(pij[,1])),xaxt='n',yaxt='n',col=transp(pijr$col,.6),ylim=c(0,6e-05),pch=16,xlab="",ylab="",cex.lab=1.25, cex.axis=1.25)
+#labs<-table(factor(pij$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
+#bla<-c()
+#bla[1]<-labs[1]/2
+#for (i in 2:19){
+#bla[i]<-sum(labs[1:i-1])+labs[i]/2
+#}
+#bla[20]<-bla[19]+labs[19]/2+17
+#axis(1,at=bla,labels=c(seq(1,19,by=1),"U"),cex.lab=0.4, cex.axis=1.25)
+#axis(2,at=c(0,0.00003,0.00006),labels=c("0","3e-05","6e-05"))
+#text(-160,8e-5,substitute(paste('(b) ',italic('P. jacobeus'))),cex=1.4)
+#dev.off()
+#
+## Alternative way of visualizing relationship between Fst and pi
+#pdf("/homes/davidlee/Desktop/Fst_pi_spec.pdf",width=8,height=6)
+#datam$col[datam$col=="grey85"]<-"grey25"
+#par(fig=c(0,0.5,0,0.8))
+#plot(pim$PI,datam$WEIGHTED_FST,xlab=expression(pi ~ (x ~ 10^-5)),ylab=expression(italic(F)[ST]),col=transp(datam$col,.2),main="",xaxt='n',pch=16)
+#axis(1,at=c(0,0.00001,0.00002,0.00003,0.00004,0.00005),labels=c("0","1","2","3","4","5"))
+#
+#par(fig=c(0,0.5,0.5,1), new=TRUE)
+#hist(pim$PI,breaks=100,border=NA,col="grey85",xaxt='n',yaxt='n',xlab="",ylab="",main="")
+#par(xpd = TRUE)
+#text(-0.000004,200,substitute(paste('(a) ',italic('P. maximus'))),cex=1.2)
+#
+#par(new=T)
+#dataj$col[dataj$col=="grey85"]<-"grey25"
+#par(fig=c(0.5,1,0,0.8),new=T)
+#plot(pij$PI,dataj$WEIGHTED_FST,xlab=expression(pi ~ (x ~ 10^-5)),ylab=expression(italic(F)[ST]),col=transp(dataj$col,.2),main="",xaxt='n',pch=16)
+#axis(1,at=c(0,0.00001,0.00002,0.00003,0.00004,0.00005),labels=c("0","1","2","3","4","5"))
+#
+#par(fig=c(0.5,1,0.5,1), new=TRUE)
+#hist(pij$PI,breaks=100,border=NA,col="grey85",xaxt='n',yaxt='n',xlab="",ylab="",main="")
+#par(xpd = TRUE)
+#text(-0.0000044,150,substitute(paste('(b) ',italic('P. jacobeus'))),cex=1.2)
+#dev.off()
 
