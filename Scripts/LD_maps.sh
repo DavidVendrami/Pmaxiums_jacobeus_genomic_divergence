@@ -76,20 +76,19 @@ done
 
 R
 
-max<-read.table("Pmax_1.ld",h=F)
-jac<-read.table("Pjac_1.ld",h=F)
+library(LDheatmap)
+library(RColorBrewer)
 
-pdf("Pmax_Pjac_chr1.pdf",width=5,height=5)
-LDheatmap(as.matrix(max),add.map=F,title=substitute(paste(italic('P. maximus'), " - Chromosome 1")))
-LDheatmap(as.matrix(jac),add.map=F,title=substitute(paste(italic('P. jacobeus'), " - Chromosome 1")),newpage=T)
+for (i in 1:19){
+
+max<-read.table(paste("Pmax_",i,".ld",sep=""),h=F)
+jac<-read.table(paste("Pjac_",i,".ld",sep=""),h=F)
+
+tiff(paste("Pmax_",i,".tiff",sep=""),width=5,height=5, units= 'in', res=600, pointsize=1/600)
+LDheatmap(as.matrix(max),color=rev(brewer.pal(n=9,name="YlOrRd")),add.map=F,title=substitute(paste(italic('P. maximus'), " - Chromosome 1")))
 dev.off()
 
-tiff("Pmax_chr1tiff",width=5,height=5, units= 'in', res=600, pointsize=1/600)
-LDheatmap(as.matrix(max),add.map=F,title=substitute(paste(italic('P. maximus'), " - Chromosome 1")))
+tiff(paste("Pjac_",i,".tiff",sep=""),width=5,height=5, units= 'in', res=600, pointsize=1/600)
+LDheatmap(as.matrix(jac),color=rev(brewer.pal(n=9,name="YlOrRd")),add.map=F,title=substitute(paste(italic('P. maximus'), " - Chromosome 1")))
 dev.off()
-
-tiff("Pjac_chr1.tiff",width=5,height=5, units= 'in', res=600, pointsize=1/600)
-LDheatmap(as.matrix(jac),add.map=F,title=substitute(paste(italic('P. jacobeus'), " - Chromosome 1")))
-dev.off()
-
-# Repeat for all othe chromosomes
+}
