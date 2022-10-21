@@ -85,10 +85,10 @@ max<-read.table(paste("Pmax_",i,".ld",sep=""),h=F)
 jac<-read.table(paste("Pjac_",i,".ld",sep=""),h=F)
 
 tiff(paste("Pmax_",i,".tiff",sep=""),width=5,height=5, units= 'in', res=600, pointsize=1/600)
-LDheatmap(as.matrix(max),color=rev(brewer.pal(n=9,name="YlOrRd")),add.map=F,title=substitute(paste(italic('P. maximus'), " - Chromosome 1")))
+LDheatmap(as.matrix(max),color=rev(brewer.pal(n=9,name="YlOrRd")),add.map=F,title=paste("P. maximus", " - Chromosome ",i,sep=""))
 dev.off()
 
 tiff(paste("Pjac_",i,".tiff",sep=""),width=5,height=5, units= 'in', res=600, pointsize=1/600)
-LDheatmap(as.matrix(jac),color=rev(brewer.pal(n=9,name="YlOrRd")),add.map=F,title=substitute(paste(italic('P. maximus'), " - Chromosome 1")))
+LDheatmap(as.matrix(jac),color=rev(brewer.pal(n=9,name="YlOrRd")),add.map=F,title=paste("P. jacobeus", " - Chromosome ",i,sep=""))
 dev.off()
 }
