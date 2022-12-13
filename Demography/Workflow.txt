@@ -1,0 +1,43 @@
+### 2. Demographic reconstruction
+
+conda activate easySFS
+
+./easySFS/easySFS.py -i ../Clean/ref_map_output/Pec_Biall_DP5_MissInd_MD80_NoRep_MAF05.recode.vcf -p pops_file.txt --preview -a
+./easySFS/easySFS.py -i ../Clean/ref_map_output/Pec_Biall_DP5_MissInd_MD80_NoRep_MAF05.recode.vcf -p pops_file.txt --proj X,Y -a
+
+# Where X and Y are the down-projection that maximizes the number of segregating sites.
+
+### fastsimcoal2 (models in respecive folders)
+for i in {1..50};
+do
+/prj/mar-in-gen/bin/fsc27_linux64/fsc2702 -t MODEL.tpl -n 100000 -m -e MODEL.est -M -L 20 -c6 -q -x
+mv MODEL MODEL_$i/
+done
+
+# Change "MODEL" to the model you want to run (e.g.: "SI")
+
+# Collect all likelihoods values for a given model (do it for all)
+cat MODEL*/*.bestlhoods | grep -v 'Max' > All_lhoods.txt
+
+# Identify best run within each model and then the best model
+
+# Generate 95% CIs
+# Modify the maxL.par file as described in the fastsimcoal2 manual and then use it simulate 100 SFS
+./fsc26 -i MODEL_maxL.par -n100 -j -m -s0 -u -x -q
+
+# Re-run fsc26 using same .tpl and .est files (now called MODEL_maxL.tpl and MODEL_maxL.est) on each of the 100 newly generated (simulated) SFS
+
+for j in {1..100};
+do
+cd MODEL_maxL_$j
+
+for i in {1..20};
+do
+/grp/animalbehaviour/davidlee/bin/fsc27_linux64/fsc2702 -t MODEL_maxL.tpl -n 100000 -m -e SCS_MODEL.est -M -L 20 -q -x --initvalues SCS.pv -c 6 --multiSFS
+mv SCS_maxL SCS_maxL_$i
+done
+
+cd ../
+done
+
+# Now pick the best runs for each of the 100 simulated SFS and use them to compute the 95% CIs (i.e.: 0.025 and 0.975 quantiles)
