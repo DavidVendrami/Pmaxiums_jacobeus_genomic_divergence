@@ -1,0 +1,72 @@
+### Calculate dxy using Pixy
+
+# First you need to get an all-sites VCF file (i.e.: vcf containing also non-polymorphic sites).
+# This can be done within Stacks populations module by adding the flag --vcf-all
+# Fitler the resulting file for --min-dp 5 and --max-missing 0.8 using vcftools
+# Then get the same set of polimorphic loci to the not-all-sites vcf file by making a blacklist of all loci that are dropped during filtering
+# Use the blacklist to exclude these loci and retain the 'good polymorphic loci' as well as non-variant sites.
+
+# Make a bed file with coordinates of the windows used to calculate Fst (you can take it directly form the fst output of vcftools)
+
+# Run pixy 
+
+pixy --stats pi \
+--vcf All_sites.vcf.gz \
+--populations popfile.txt \
+--bed-file Windows.bed \
+--n_cores 4 \
+--output_folder pixy_output \
+--output_prefix pecten_dxy
+
+### Check results and compare to fst
+data<-read.table("/prj/mar-in-gen/Pecten_M/Clean/ref_map_output/Window_Fst_MAF05.windowed.weir.fst",h=T)
+data<-data[data$N_VARIANTS>=5,] # Retain only windows with at least 10 SNPs inside
+
+col<-c()
+cols<-c("grey25","grey85")
+col[1]<-"grey25"
+for (i in 2:length(data$CHROM)){
+  if(data$CHROM[i]==data$CHROM[i-1]){
+    col[i]<-col[i-1]
+  } else {
+    col[i]<-cols[which(cols!=col[i-1])]
+  }
+}
+col[4458:length(col)]<-"grey85" 
+data$col<-col
+
+labs<-table(factor(data$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
+bla<-c()
+bla[1]<-labs[1]/2
+for (i in 2:19){
+bla[i]<-sum(labs[1:i-1])+labs[i]/2
+}
+bla[20]<-4457
+
+
+dxy<-read.table("pixy_dxy.txt",h=T)
+data$INDEX<-paste(data$CHROM,data$BIN_START,data$BIN_END,sep="_")
+dxy$INDEX<-paste(dxy$chromosome,dxy$window_pos_1,dxy$window_pos_2,sep="_")
+both<-left_join(data,dxy,by="INDEX")
+fina<-both[,c(1,2,3,4,5,7,8,14)]
+ind<-which(data$WEIGHTED_FST>=quantile(fina$WEIGHTED_FST,probs=c(0.95)))
+div<-c()
+div[1:4460]<-"NO"
+div[ind]<-"YES"
+fina$div<-div
+
+# Plor islands vs non-islands
+pdf("~/Desktop/Fst_dxy",width=7,height=6)
+par(mfrow=c(1,2))
+par(xpd=T)
+boxplot(fina$WEIGHTED_FST[fina$div=="YES"],fina$WEIGHTED_FST[fina$div=="NO"],ylab=expression(italic(F)[ST]),names=c("islands","non-islands"),lty=1,staplelty = 0,outcol=transp("black",.1))
+text(0,1.09,"(a)",cex=1.2)
+boxplot(fina$avg_dxy[fina$div=="YES"],fina$avg_dxy[fina$div=="NO"],ylim=c(0,0.04),ylab=expression(italic(d)[xy]),names=c("islands","non-islands"),lty=1,staplelty = 0,outcol=transp("black",.1))
+text(0,0.045,"(b)",cex=1.2)
+dev.off()
+
+# Get mean chromosomes dxy values
+avg<-c()
+for (i in 1:19){
+avg[i]<-mean(fina$avg_dxy[fina$CHROM==paste("HiC_scaffold_",i,sep="")])
+}
