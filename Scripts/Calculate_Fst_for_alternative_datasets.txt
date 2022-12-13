@@ -1,0 +1,336 @@
+### Plot new FST from the following alternatively filtered datasets:
+# 1. with PJ unique SNPs
+# 2. (no MAF)
+# 3. MAF = 0.01
+# 4. HWE 50%
+# 5. HWE all
+
+# 1.
+grep -v '#' ../../ref_map_output/Pec_Biall_DP5_MissInd_MD80_NoRep_MAF05.recode.vcf | cut -d '       ' -f1,2 > MAF05_FinalSNPs.txt
+grep -f SNPs_uniquely_genotyped_in_Pj.txt Pec_Biall_DP5_GoodSam.recode.vcf | cut -d '       ' -f1,2 > Pj_unique.txt
+cat MAF05_FinalSNPs.txt Pj_unique.txt > SNPs_antiMD80.txt
+vcftools --vcf Pec_Biall_DP5_GoodSam.recode.vcf --positions SNPs_antiMD80.txt --recode --out Final_plus33
+cut -d ' ' -f2 ../../ref_map_output/Pec_Biall_DP5_MissInd_MD80_NoRep_MAF05.fam > Final_inds.txt
+vcftools --vcf Final_plus33.recode.vcf --keep Final_inds.txt --recode --out Final_plus33_RightInds
+vcftools --vcf Final_plus33_RightInds.recode.vcf --weir-fst-pop ../../ref_map_output/P_jacobeus.txt --weir-fst-pop ../../ref_map_output/P_maximus.txt --fst-window-size 100000 --out Window_plus33
+
+# 2.
+vcftools --vcf no_MAF.recode.vcf --weir-fst-pop ../../ref_map_output/P_jacobeus.txt --weir-fst-pop ../../ref_map_output/P_maximus.txt --fst-window-size 100000 --out Window_Fst_noMAF
+
+R
+data<-read.table("Window_Fst_noMAF.windowed.weir.fst",h=T)
+data<-data[data$N_VARIANTS>=5,] # Retain only windows with at least 10 SNPs inside
+
+col<-c()
+cols<-c("grey25","grey85")
+col[1]<-"grey25"
+for (i in 2:length(data$CHROM)){
+  if(data$CHROM[i]==data$CHROM[i-1]){
+    col[i]<-col[i-1]
+  } else {
+    col[i]<-cols[which(cols!=col[i-1])]
+  }
+}
+col[8175:length(col)]<-"grey85" 
+data$col<-col
+
+labs<-table(factor(data$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
+bla<-c()
+bla[1]<-labs[1]/2
+for (i in 2:19){
+bla[i]<-sum(labs[1:i-1])+labs[i]/2
+}
+
+pdf("Fst_noMAF.pdf",width=16,height=6)
+plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',col=transp(data$col,.6),ylim=c(0,1),pch=16,xlab="Chromosomes",ylab="Stepping window Fst",cex.lab=1.25, cex.axis=1.25)
+axis(1,at=bla,labels=c(seq(1,19,by=1)),cex.lab=0.4, cex.axis=1.25)
+abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
+dev.off()
+
+
+# 3.
+vcftools --vcf MAF_01.recode.vcf --weir-fst-pop ../../ref_map_output/P_jacobeus.txt --weir-fst-pop ../../ref_map_output/P_maximus.txt --fst-window-size 100000 --out Window_Fst01
+
+R
+data<-read.table("Window_FstMAF01.windowed.weir.fst",h=T)
+data<-data[data$N_VARIANTS>=5,] # Retain only windows with at least 10 SNPs inside
+
+col<-c()
+cols<-c("grey25","grey85")
+col[1]<-"grey25"
+for (i in 2:length(data$CHROM)){
+  if(data$CHROM[i]==data$CHROM[i-1]){
+    col[i]<-col[i-1]
+  } else {
+    col[i]<-cols[which(cols!=col[i-1])]
+  }
+}
+col[6955:length(col)]<-"grey85" 
+data$col<-col
+
+labs<-table(factor(data$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
+bla<-c()
+bla[1]<-labs[1]/2
+for (i in 2:19){
+bla[i]<-sum(labs[1:i-1])+labs[i]/2
+}
+
+pdf("Fst_MAF01.pdf",width=16,height=6)
+plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',col=transp(data$col,.6),ylim=c(0,1),pch=16,xlab="Chromosomes",ylab="Stepping window Fst",cex.lab=1.25, cex.axis=1.25)
+axis(1,at=bla,labels=c(seq(1,19,by=1)),cex.lab=0.4, cex.axis=1.25)
+abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
+dev.off()
+
+# 4. and 5.
+vcftools --vcf hwe05_all.recode.vcf --weir-fst-pop ../../../ref_map_output/P_jacobeus.txt --weir-fst-pop ../../../ref_map_output/P_maximus.txt --fst-window-size 100000 --out Window_Fst_hwe05All
+vcftools --vcf hwe05_half.recode.vcf --weir-fst-pop ../../../ref_map_output/P_jacobeus.txt --weir-fst-pop ../../../ref_map_output/P_maximus.txt --fst-window-size 100000 --out Window_Fst_hwe05Half
+vcftools --vcf hwe01_all.recode.vcf --weir-fst-pop ../../../ref_map_output/P_jacobeus.txt --weir-fst-pop ../../../ref_map_output/P_maximus.txt --fst-window-size 100000 --out Window_Fst_hwe01All
+
+
+#### Plot
+data<-read.table("Window_Fst_hwe05All.windowed.weir.fst",h=T) # Read in stepping window fst file
+data<-data[data$N_VARIANTS>=5,] # Retain only windows with at least 10 SNPs inside
+col<-c()
+cols<-c("grey25","grey85")
+col[1]<-"grey25"
+for (i in 2:length(data$CHROM)){
+  if(data$CHROM[i]==data$CHROM[i-1]){
+    col[i]<-col[i-1]
+  } else {
+    col[i]<-cols[which(cols!=col[i-1])]
+  }
+}
+col[4452:length(col)]<-"grey85" 
+data$col<-col
+labs<-table(factor(data$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
+bla<-c()
+bla[1]<-labs[1]/2
+for (i in 2:19){
+bla[i]<-sum(labs[1:i-1])+labs[i]/2
+}
+plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',col=transp(data$col,.6),ylim=c(0,1),pch=16,xlab="Chromosomes",ylab="Stepping window Fst",cex.lab=1.25, cex.axis=1.25,main="HWE - p < 0.05 - All populations")
+axis(1,at=bla,labels=c(seq(1,19,by=1)),cex.lab=0.4, cex.axis=1.25)
+abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
+
+data<-read.table("Window_Fst_hwe05Half.windowed.weir.fst",h=T) # Read in stepping window fst file
+data<-data[data$N_VARIANTS>=5,] # Retain only windows with at least 10 SNPs inside
+col<-c()
+cols<-c("grey25","grey85")
+col[1]<-"grey25"
+for (i in 2:length(data$CHROM)){
+  if(data$CHROM[i]==data$CHROM[i-1]){
+    col[i]<-col[i-1]
+  } else {
+    col[i]<-cols[which(cols!=col[i-1])]
+  }
+}
+col[4428:length(col)]<-"grey85" 
+data$col<-col
+labs<-table(factor(data$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
+bla<-c()
+bla[1]<-labs[1]/2
+for (i in 2:19){
+bla[i]<-sum(labs[1:i-1])+labs[i]/2
+}
+plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',col=transp(data$col,.6),ylim=c(0,1),pch=16,xlab="Chromosomes",ylab="Stepping window Fst",cex.lab=1.25, cex.axis=1.25,main="HWE - p < 0.05 - Half populations")
+axis(1,at=bla,labels=c(seq(1,19,by=1)),cex.lab=0.4, cex.axis=1.25)
+abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
+
+data<-read.table("Window_Fst_hwe01All.windowed.weir.fst",h=T) # Read in stepping window fst file
+data<-data[data$N_VARIANTS>=5,] # Retain only windows with at least 10 SNPs inside
+col<-c()
+cols<-c("grey25","grey85")
+col[1]<-"grey25"
+for (i in 2:length(data$CHROM)){
+  if(data$CHROM[i]==data$CHROM[i-1]){
+    col[i]<-col[i-1]
+  } else {
+    col[i]<-cols[which(cols!=col[i-1])]
+  }
+}
+col[4442:length(col)]<-"grey85" 
+data$col<-col
+labs<-table(factor(data$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
+bla<-c()
+bla[1]<-labs[1]/2
+for (i in 2:19){
+bla[i]<-sum(labs[1:i-1])+labs[i]/2
+}
+plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',col=transp(data$col,.6),ylim=c(0,1),pch=16,xlab="Chromosomes",ylab="Stepping window Fst",cex.lab=1.25, cex.axis=1.25,main="HWE - p < 0.01 - Half populations")
+axis(1,at=bla,labels=c(seq(1,19,by=1)),cex.lab=0.4, cex.axis=1.25)
+abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
+
+### Let's make a figure with all Fst plots (no hwe 01 so that we have an even number)
+pdf("/homes/davidlee/Desktop/Fst_comparisons_SF.pdf",width=15,height=8)
+par(mfrow=c(3,2))
+
+#A
+data<-read.table("../../ref_map_output/Window_Fst_MAF05.windowed.weir.fst",h=T) # Read in stepping window fst file
+data<-data[data$N_VARIANTS>=5,] # Retain only windows with at least 10 SNPs inside
+col<-c()
+cols<-c("grey25","grey85")
+col[1]<-"grey25"
+for (i in 2:length(data$CHROM)){
+  if(data$CHROM[i]==data$CHROM[i-1]){
+    col[i]<-col[i-1]
+  } else {
+    col[i]<-cols[which(cols!=col[i-1])]
+  }
+}
+col[4458:length(col)]<-"grey85" 
+data$col<-col
+labs<-table(factor(data$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
+bla<-c()
+bla[1]<-labs[1]/2
+for (i in 2:19){
+bla[i]<-sum(labs[1:i-1])+labs[i]/2
+}
+plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',col=transp(data$col,.6),ylim=c(0,1),pch=16,xlab="Chromosomes",ylab="Fst",cex.lab=1.25, cex.axis=1.25,main="")
+axis(1,at=bla,labels=c(seq(1,19,by=1)),cex.lab=0.4, cex.axis=1.25)
+abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
+par(xpd=T)
+text(-400,1.3,"(a)",cex=1.5)
+par(xpd=F)
+
+#B
+data<-read.table("../MD_needed/Window_plus33.windowed.weir.fst",h=T)
+data<-data[data$N_VARIANTS>=5,] # Retain only windows with at least 10 SNPs inside
+col<-c()
+cols<-c("grey25","grey85")
+col[1]<-"grey25"
+for (i in 2:length(data$CHROM)){
+  if(data$CHROM[i]==data$CHROM[i-1]){
+    col[i]<-col[i-1]
+  } else {
+    col[i]<-cols[which(cols!=col[i-1])]
+  }
+}
+col[4460:length(col)]<-"grey85" 
+data$col<-col
+labs<-table(factor(data$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
+bla<-c()
+bla[1]<-labs[1]/2
+for (i in 2:19){
+bla[i]<-sum(labs[1:i-1])+labs[i]/2
+}
+plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',col=transp(data$col,.6),ylim=c(0,1),pch=16,xlab="Chromosomes",ylab="Fst",cex.lab=1.25, cex.axis=1.25,main="")
+axis(1,at=bla,labels=c(seq(1,19,by=1)),cex.lab=0.4, cex.axis=1.25)
+abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
+par(xpd=T)
+text(-400,1.3,"(b)",cex=1.5)
+par(xpd=F)
+
+#C
+data<-read.table("Window_Fst_noMAF.windowed.weir.fst",h=T)
+data<-data[data$N_VARIANTS>=5,] # Retain only windows with at least 10 SNPs inside
+col<-c()
+cols<-c("grey25","grey85")
+col[1]<-"grey25"
+for (i in 2:length(data$CHROM)){
+  if(data$CHROM[i]==data$CHROM[i-1]){
+    col[i]<-col[i-1]
+  } else {
+    col[i]<-cols[which(cols!=col[i-1])]
+  }
+}
+col[8175:length(col)]<-"grey85" 
+data$col<-col
+labs<-table(factor(data$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
+bla<-c()
+bla[1]<-labs[1]/2
+for (i in 2:19){
+bla[i]<-sum(labs[1:i-1])+labs[i]/2
+}
+plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',main="",col=transp(data$col,.6),ylim=c(0,1),pch=16,xlab="Chromosomes",ylab="Fst",cex.lab=1.25, cex.axis=1.25)
+axis(1,at=bla,labels=c(seq(1,19,by=1)),cex.lab=0.4, cex.axis=1.25)
+abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
+par(xpd=T)
+text(-700,1.3,"(c)",cex=1.5)
+par(xpd=F)
+
+#D
+data<-read.table("Window_FstMAF01.windowed.weir.fst",h=T)
+data<-data[data$N_VARIANTS>=5,] # Retain only windows with at least 10 SNPs inside
+col<-c()
+cols<-c("grey25","grey85")
+col[1]<-"grey25"
+for (i in 2:length(data$CHROM)){
+  if(data$CHROM[i]==data$CHROM[i-1]){
+    col[i]<-col[i-1]
+  } else {
+    col[i]<-cols[which(cols!=col[i-1])]
+  }
+}
+col[6955:length(col)]<-"grey85" 
+data$col<-col
+labs<-table(factor(data$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
+bla<-c()
+bla[1]<-labs[1]/2
+for (i in 2:19){
+bla[i]<-sum(labs[1:i-1])+labs[i]/2
+}
+plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',main="",col=transp(data$col,.6),ylim=c(0,1),pch=16,xlab="Chromosomes",ylab="Fst",cex.lab=1.25, cex.axis=1.25)
+axis(1,at=bla,labels=c(seq(1,19,by=1)),cex.lab=0.4, cex.axis=1.25)
+abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
+par(xpd=T)
+text(-600,1.3,"(d)",cex=1.5)
+par(xpd=F)
+
+#E
+data<-read.table("../HWE/HWE_fitlered_files/Window_Fst_hwe05All.windowed.weir.fst",h=T) # Read in stepping window fst file
+data<-data[data$N_VARIANTS>=5,] # Retain only windows with at least 10 SNPs inside
+col<-c()
+cols<-c("grey25","grey85")
+col[1]<-"grey25"
+for (i in 2:length(data$CHROM)){
+  if(data$CHROM[i]==data$CHROM[i-1]){
+    col[i]<-col[i-1]
+  } else {
+    col[i]<-cols[which(cols!=col[i-1])]
+  }
+}
+col[4452:length(col)]<-"grey85" 
+data$col<-col
+labs<-table(factor(data$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
+bla<-c()
+bla[1]<-labs[1]/2
+for (i in 2:19){
+bla[i]<-sum(labs[1:i-1])+labs[i]/2
+}
+plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',col=transp(data$col,.6),ylim=c(0,1),pch=16,xlab="Chromosomes",ylab="Fst",cex.lab=1.25, cex.axis=1.25,main="")
+axis(1,at=bla,labels=c(seq(1,19,by=1)),cex.lab=0.4, cex.axis=1.25)
+abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
+par(xpd=T)
+text(-375,1.3,"(e)",cex=1.5)
+par(xpd=F)
+
+#F
+data<-read.table("../HWE/HWE_fitlered_files/Window_Fst_hwe05Half.windowed.weir.fst",h=T) # Read in stepping window fst file
+data<-data[data$N_VARIANTS>=5,] # Retain only windows with at least 10 SNPs inside
+col<-c()
+cols<-c("grey25","grey85")
+col[1]<-"grey25"
+for (i in 2:length(data$CHROM)){
+  if(data$CHROM[i]==data$CHROM[i-1]){
+    col[i]<-col[i-1]
+  } else {
+    col[i]<-cols[which(cols!=col[i-1])]
+  }
+}
+col[4428:length(col)]<-"grey85" 
+data$col<-col
+labs<-table(factor(data$CHROM,levels=c("HiC_scaffold_1","HiC_scaffold_2","HiC_scaffold_3","HiC_scaffold_4","HiC_scaffold_5","HiC_scaffold_6","HiC_scaffold_7","HiC_scaffold_8","HiC_scaffold_9","HiC_scaffold_10","HiC_scaffold_11","HiC_scaffold_12","HiC_scaffold_13","HiC_scaffold_14","HiC_scaffold_15","HiC_scaffold_16","HiC_scaffold_17","HiC_scaffold_18","HiC_scaffold_19")))[1:19]
+bla<-c()
+bla[1]<-labs[1]/2
+for (i in 2:19){
+bla[i]<-sum(labs[1:i-1])+labs[i]/2
+}
+plot(1:length(data[,1]),data$WEIGHTED_FST,xaxt='n',col=transp(data$col,.6),ylim=c(0,1),pch=16,xlab="Chromosomes",ylab="Fst",cex.lab=1.25, cex.axis=1.25,main="")
+axis(1,at=bla,labels=c(seq(1,19,by=1)),cex.lab=0.4, cex.axis=1.25)
+abline(h=c(quantile(data$WEIGHTED_FST,probs=c(0.95))),lty=2,col=c("#de2d26"))
+par(xpd=T)
+text(-375,1.3,"(f)",cex=1.5)
+par(xpd=F)
+
+dev.off()
+
